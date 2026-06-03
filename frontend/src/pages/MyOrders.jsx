@@ -30,113 +30,283 @@ const MyOrders = () => {
     fetchOrders();
   }, [user]);
 
+  const formatPrice = (price) => {
+    return Number(price || 0).toLocaleString("en-IN");
+  };
+
+  const getOrderDate = (date) => {
+    if (!date) {
+      return "Not available";
+    }
+
+    return new Date(date).toLocaleDateString("en-IN");
+  };
+
+  const getShortOrderId = (id) => {
+    if (!id) {
+      return "ORDER";
+    }
+
+    return id.toString().slice(-8).toUpperCase();
+  };
+
   if (loading) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center px-4">
-        <p className="text-lg font-bold text-orange-500">
-          Loading your orders...
-        </p>
+      <div className="min-h-[80vh] bg-[#050505] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#d4af37]/20 border-t-[#d4af37] rounded-full animate-spin mx-auto"></div>
+          <p className="mt-5 text-[#d4af37] font-black">
+            Loading your orders...
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-extrabold mb-8 text-gray-900">
-        My Order History
-      </h1>
+    <div className="min-h-[80vh] bg-[#050505]">
+      <div className="page-shell py-12">
+        <div className="mb-8">
+          <p className="text-[#d4af37] text-sm font-black uppercase tracking-[0.25em] mb-3">
+            Order History
+          </p>
 
-      {orders.length === 0 ? (
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm text-center">
-          <p className="text-gray-600">You haven't placed any orders yet.</p>
+          <h1 className="text-4xl sm:text-5xl font-black">My Orders</h1>
+
+          <p className="text-white/50 mt-3">
+            View your placed orders, delivery details, payment status, and order
+            confirmation.
+          </p>
         </div>
-      ) : (
-        <div className="space-y-6">
-          {orders.map((order) => {
-            const totalPrice = Number(order.totalPrice || 0).toLocaleString(
-              "en-IN"
-            );
 
-            return (
-              <div
-                key={order._id}
-                className="bg-white rounded-3xl shadow-sm overflow-hidden border border-gray-100"
-              >
-                <div className="bg-gray-50 p-5 border-b border-gray-100 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-                  <div className="min-w-0">
-                    <p className="text-sm text-gray-500">Order ID</p>
+        {orders.length === 0 ? (
+          <div className="rounded-[2.5rem] border border-[#d4af37]/20 bg-[#0b0b0f] p-10 text-center">
+            <h2 className="text-3xl font-black">No orders yet</h2>
 
-                    <p className="font-mono text-gray-900 font-bold text-sm break-all">
-                      {order._id}
-                    </p>
-                  </div>
+            <p className="text-white/50 mt-3">
+              Your placed orders will appear here.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {orders.map((order) => {
+              const shippingAddress = order.shippingAddress || {};
+              const hasShippingAddress =
+                shippingAddress.fullName &&
+                shippingAddress.phone &&
+                shippingAddress.address &&
+                shippingAddress.city &&
+                shippingAddress.state &&
+                shippingAddress.pincode;
 
-                  <div className="md:text-right">
-                    <p className="text-sm text-gray-500">Date</p>
+              const paymentMethod =
+                order.paymentMethod || "Not available for this order";
 
-                    <p className="text-gray-900 font-semibold">
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
+              const paymentStatus =
+                order.paymentStatus ||
+                (order.isPaid ? "Paid" : "Not available");
 
-                <div className="p-5">
-                  {order.orderItems.map((item, index) => {
-                    const itemPrice = Number(item.price || 0).toLocaleString(
-                      "en-IN"
-                    );
+              const orderStatus = order.orderStatus || "Placed";
 
-                    return (
-                      <div
-                        key={index}
-                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 py-4 border-b border-gray-100 last:border-0"
-                      >
-                        <div className="flex items-center gap-4 min-w-0">
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            className="w-16 h-16 object-cover rounded-2xl bg-gray-100"
-                          />
+              const totalPrice = formatPrice(order.totalPrice);
 
-                          <div className="min-w-0">
-                            <p className="text-gray-900 font-bold break-words">
-                              {item.name}
-                            </p>
+              return (
+                <div
+                  key={order._id}
+                  className="rounded-[2.5rem] overflow-hidden border border-white/10 bg-[#0b0b0f] shadow-2xl shadow-black/40"
+                >
+                  {/* Header */}
+                  <div className="p-6 border-b border-white/10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+                    <div className="min-w-0">
+                      <p className="text-[#d4af37] text-xs font-black uppercase tracking-widest">
+                        Order ID
+                      </p>
 
-                            <p className="text-gray-500 text-sm">
-                              Qty: {item.qty}
-                            </p>
-                          </div>
-                        </div>
+                      <p className="font-mono text-white text-sm break-all mt-2">
+                        #{getShortOrderId(order._id)}
+                      </p>
+                    </div>
 
-                        <p className="text-gray-900 font-extrabold">
-                          ₹{itemPrice}
+                    <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
+                      <div>
+                        <p className="text-white/35 text-xs font-bold uppercase">
+                          Date
+                        </p>
+
+                        <p className="text-white font-bold">
+                          {getOrderDate(order.createdAt)}
                         </p>
                       </div>
-                    );
-                  })}
-                </div>
 
-                <div className="bg-gray-50 p-5 border-t border-gray-100 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                  <span
-                    className={`w-fit px-4 py-2 rounded-full text-xs font-bold ${
-                      order.isPaid
-                        ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}
-                  >
-                    {order.isPaid ? "Paid" : "Pending Payment"}
-                  </span>
+                      <span className="w-fit px-5 py-2 rounded-full text-xs font-black bg-green-400/10 text-green-300 border border-green-400/20">
+                        {orderStatus}
+                      </span>
+                    </div>
+                  </div>
 
-                  <p className="text-xl font-extrabold text-orange-600">
-                    Total: ₹{totalPrice}
-                  </p>
+                  {/* Delivery and Payment */}
+                  <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 border-b border-white/10">
+                    <div className="rounded-3xl bg-white/5 border border-white/10 p-5">
+                      <p className="text-[#d4af37] font-black mb-4">
+                        Delivery Details
+                      </p>
+
+                      {hasShippingAddress ? (
+                        <div className="space-y-2">
+                          <p className="text-white font-black">
+                            {shippingAddress.fullName}
+                          </p>
+
+                          <p className="text-white/60">
+                            Phone:{" "}
+                            <span className="text-white">
+                              {shippingAddress.phone}
+                            </span>
+                          </p>
+
+                          <p className="text-white/60 leading-relaxed">
+                            {shippingAddress.address}
+                          </p>
+
+                          <p className="text-white/60">
+                            {shippingAddress.city}, {shippingAddress.state} -{" "}
+                            {shippingAddress.pincode}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="rounded-2xl border border-yellow-400/20 bg-yellow-400/10 p-4">
+                          <p className="text-yellow-200 font-bold">
+                            Delivery details not available.
+                          </p>
+
+                          <p className="text-white/45 text-sm mt-2">
+                            This order was probably placed before the checkout
+                            address form was added.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="rounded-3xl bg-white/5 border border-white/10 p-5">
+                      <p className="text-[#d4af37] font-black mb-4">
+                        Payment Details
+                      </p>
+
+                      <div className="space-y-3">
+                        <p className="text-white/60">
+                          Method:{" "}
+                          <span className="text-white font-bold">
+                            {paymentMethod}
+                          </span>
+                        </p>
+
+                        <p className="text-white/60">
+                          Status:{" "}
+                          <span
+                            className={
+                              paymentStatus === "Paid"
+                                ? "text-green-300 font-bold"
+                                : "text-yellow-300 font-bold"
+                            }
+                          >
+                            {paymentStatus}
+                          </span>
+                        </p>
+
+                        <p className="text-white/60">
+                          Order Status:{" "}
+                          <span className="text-green-300 font-bold">
+                            {orderStatus}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Products */}
+                  <div className="p-6 space-y-4">
+                    {order.orderItems.map((item, index) => {
+                      const itemPrice = formatPrice(item.price);
+                      const itemTotal = formatPrice(
+                        Number(item.price || 0) * Number(item.qty || 1)
+                      );
+
+                      return (
+                        <div
+                          key={index}
+                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-3xl bg-white/5 border border-white/10 p-4"
+                        >
+                          <div className="flex items-center gap-4 min-w-0">
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="w-20 h-20 object-cover rounded-2xl bg-black"
+                            />
+
+                            <div className="min-w-0">
+                              <p className="text-white font-black break-words">
+                                {item.name}
+                              </p>
+
+                              <p className="text-white/45 text-sm mt-1">
+                                Qty: {item.qty || 1}
+                              </p>
+
+                              <p className="text-white/35 text-sm">
+                                Single Price: ₹{itemPrice}
+                              </p>
+                            </div>
+                          </div>
+
+                          <p className="text-[#d4af37] font-black text-xl">
+                            ₹{itemTotal}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Confirmation message */}
+                  {order.confirmationMessage ? (
+                    <div className="mx-6 mb-6 rounded-3xl bg-green-400/10 border border-green-400/20 p-5">
+                      <p className="text-green-300 font-black">
+                        Confirmation Message
+                      </p>
+
+                      <p className="text-white/70 mt-2">
+                        {order.confirmationMessage}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="mx-6 mb-6 rounded-3xl bg-yellow-400/10 border border-yellow-400/20 p-5">
+                      <p className="text-yellow-200 font-black">
+                        Confirmation message not available.
+                      </p>
+
+                      <p className="text-white/45 mt-2 text-sm">
+                        New orders placed from the checkout page will show a
+                        generated confirmation message here.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Footer */}
+                  <div className="p-6 border-t border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <p className="text-white/45">
+                      Thank you for shopping with Aura Shop.
+                    </p>
+
+                    <p className="text-2xl font-black">
+                      Total:{" "}
+                      <span className="text-[#d4af37]">₹{totalPrice}</span>
+                    </p>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
