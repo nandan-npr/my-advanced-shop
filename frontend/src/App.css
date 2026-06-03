@@ -1,42 +1,103 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* App layout styles */
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Global font and container sizing to keep layout consistent */
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Enforce a centered content container with consistent max width */
+.container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem; /* 24px */
+  padding-right: 1.5rem; /* 24px */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* Section padding utility */
+.section {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
 }
 
+/* Ensure buttons and cards keep a clean, consistent look when Tailwind utilities are used */
+.btn-rounded {
+  border-radius: 9999px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* Make sure images don't overflow their containers */
+img { display: block; max-width: 100%; height: auto; }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease-in-out;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  box-shadow: 0 8px 20px rgba(2,6,23,0.06);
+}
+.btn-primary:hover { transform: translateY(-2px); }
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(15,23,42,0.06);
+  color: var(--color-foreground);
+}
+
+/* Cards */
 .card {
-  padding: 2em;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: var(--shadow-premium);
+  border: 1px solid rgba(15,23,42,0.04);
 }
 
-.read-the-docs {
-  color: #888;
+/* Form inputs - ensure consistent sizes */
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(15,23,42,0.06);
+  background: #fff;
 }
+.form-input:focus { outline: none; box-shadow: 0 6px 18px rgba(2,6,23,0.06); border-color: var(--color-primary); }
+
+/* Responsive tweaks */
+@media (max-width: 1024px) {
+  .hero-title { font-size: 2.25rem; }
+}
+
+@media (max-width: 640px) {
+  .container { padding-left: 1rem; padding-right: 1rem; }
+}
+
+/* Global input selectors to standardize form appearance without changing JSX */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea, select {
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(15,23,42,0.06);
+  background: #fff;
+}
+input::placeholder, textarea::placeholder { color: rgba(15,23,42,0.35); }
+
+button { font-family: inherit; }
